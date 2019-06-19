@@ -77,10 +77,13 @@ public class JestElasticsearchClient implements ElasticsearchClient {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+  private static final String INCLUDE_TYPE_NAME_PARAM = "include_type_name";
+
   private final JestClient client;
   private final Version version;
 
   private final Set<String> indexCache = new HashSet<>();
+
 
   // visible for testing
   public JestElasticsearchClient(JestClient client) {
@@ -235,6 +238,8 @@ public class JestElasticsearchClient implements ElasticsearchClient {
       return Version.ES_V5;
     } else if (esVersion.startsWith("6.")) {
       return Version.ES_V6;
+    } else if (esVersion.startsWith("7.")) {
+      return Version.ES_V7;
     }
     return defaultVersion;
   }
@@ -290,7 +295,11 @@ public class JestElasticsearchClient implements ElasticsearchClient {
   public void createMapping(String index, String type, Schema schema) throws IOException {
     ObjectNode obj = JsonNodeFactory.instance.objectNode();
     obj.set(type, Mapping.inferMapping(this, schema));
-    PutMapping putMapping = new PutMapping.Builder(index, type, obj.toString()).build();
+    PutMapping.Builder builder = new PutMapping.Builder(index, type, obj.toString());
+    if (getVersion() == Version.ES_V7) {
+      builder.setParameter(INCLUDE_TYPE_NAME_PARAM, true);
+    }
+    PutMapping putMapping = builder.build();
     JestResult result = client.execute(putMapping);
     if (!result.isSucceeded()) {
       throw new ConnectException(
@@ -303,9 +312,11 @@ public class JestElasticsearchClient implements ElasticsearchClient {
    * Get the JSON mapping for given index and type. Returns {@code null} if it does not exist.
    */
   public JsonObject getMapping(String index, String type) throws IOException {
-    final JestResult result = client.execute(
-        new GetMapping.Builder().addIndex(index).addType(type).build()
-    );
+    GetMapping.Builder builder = new GetMapping.Builder().addIndex(index).addType(type);
+    if (getVersion() == Version.ES_V7) {
+      builder.setParameter(INCLUDE_TYPE_NAME_PARAM, true);
+    }
+    final JestResult result = client.execute(builder.build());
     final JsonObject indexRoot = result.getJsonObject().getAsJsonObject(index);
     if (indexRoot == null) {
       return null;
