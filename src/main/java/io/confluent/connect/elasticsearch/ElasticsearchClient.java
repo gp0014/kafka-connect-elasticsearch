@@ -15,7 +15,6 @@
 
 package io.confluent.connect.elasticsearch;
 
-import com.google.gson.JsonObject;
 import io.confluent.connect.elasticsearch.bulk.BulkRequest;
 import io.confluent.connect.elasticsearch.bulk.BulkResponse;
 import org.apache.kafka.connect.data.Schema;
@@ -61,7 +60,7 @@ public interface ElasticsearchClient extends AutoCloseable {
    * @param type the type
    * @throws IOException if the client cannot execute the request
    */
-  JsonObject getMapping(String index, String type) throws IOException;
+  String getMapping(String index, String type) throws IOException;
 
   /**
    * Creates a bulk request for the list of {@link IndexableRecord} records.
@@ -89,7 +88,7 @@ public interface ElasticsearchClient extends AutoCloseable {
    * @return the search result
    * @throws IOException if the client cannot execute the request
    */
-  JsonObject search(String query, String index, String type) throws IOException;
+  String search(String query, String index, String type) throws IOException;
 
   /**
    * Shuts down the client.

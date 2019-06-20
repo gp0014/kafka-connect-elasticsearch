@@ -16,7 +16,7 @@
 package io.confluent.connect.elasticsearch;
 
 import io.confluent.connect.elasticsearch.bulk.BulkProcessor;
-import io.confluent.connect.elasticsearch.jest.JestElasticsearchClient;
+import io.confluent.connect.elasticsearch.rest.RestElasticsearchClient;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;
@@ -119,7 +119,7 @@ public class ElasticsearchSinkTask extends SinkTask {
       if (client != null) {
         this.client = client;
       } else {
-        this.client = new JestElasticsearchClient(props);
+        this.client = new RestElasticsearchClient(props);
       }
 
       ElasticsearchWriter.Builder builder = new ElasticsearchWriter.Builder(this.client)

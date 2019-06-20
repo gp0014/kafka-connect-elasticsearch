@@ -18,7 +18,6 @@ package io.confluent.connect.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonObject;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Field;
@@ -69,7 +68,7 @@ public class Mapping {
   /**
    * Get the JSON mapping for given index and type. Returns {@code null} if it does not exist.
    */
-  public static JsonObject getMapping(ElasticsearchClient client, String index, String type)
+  public static String getMapping(ElasticsearchClient client, String index, String type)
       throws IOException {
     return client.getMapping(index, type);
   }
