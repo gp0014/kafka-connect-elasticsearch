@@ -235,6 +235,7 @@ public class RestElasticsearchClient implements ElasticsearchClient {
             return BulkResponse.success();
         }
 
+        boolean retryable = true;
         final List<Key> versionConflicts = new ArrayList<>();
         final List<String> errors = new ArrayList<>();
 
@@ -243,6 +244,9 @@ public class RestElasticsearchClient implements ElasticsearchClient {
                 RestStatus status = itemResponse.getFailure().getStatus();
                 if (status == RestStatus.CONFLICT) {
                     versionConflicts.add(new Key(itemResponse.getIndex(), itemResponse.getType(), itemResponse.getId()));
+                } else if(status == RestStatus.BAD_REQUEST) {
+                    retryable = false;
+                    errors.add(itemResponse.getFailureMessage());
                 } else {
                     errors.add(itemResponse.getFailureMessage());
                 }
@@ -259,7 +263,7 @@ public class RestElasticsearchClient implements ElasticsearchClient {
 
         final String errorInfo = errors.isEmpty() ? responses.buildFailureMessage() : errors.stream().reduce((a, b) -> a + ", " + b).get();
 
-        return BulkResponse.failure(true, errorInfo);
+        return BulkResponse.failure(retryable, errorInfo);
     }
 
     @Override

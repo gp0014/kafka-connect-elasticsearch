@@ -40,8 +40,7 @@
 
     <properties>
         <es.version>7.1.1</es.version>
-        <lucene.version>5.5.2</lucene.version>
-        <jest.version>2.4.0</jest.version>
+        <lucene.version>8.0.0</lucene.version>
         <kafka.connect.maven.plugin.version>0.11.1</kafka.connect.maven.plugin.version>
         <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
         <version.docker.maven.plugin>0.28.0</version.docker.maven.plugin>
